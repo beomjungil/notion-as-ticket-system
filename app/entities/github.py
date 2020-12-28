@@ -1,19 +1,40 @@
 import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
 
-class GithubAuthorEvent(BaseModel):
+class GithubAuthor(BaseModel):
     username: str
 
 
-class GithubCommitEvent(BaseModel):
+class GithubCommit(BaseModel):
     id: str
     url: str
     message: str
-    author: GithubAuthorEvent
+    author: GithubAuthor
     timestamp: datetime.datetime
 
 
-class GithubPushEvent(BaseModel):
-    commits: list[GithubCommitEvent] = []
+class GithubPullRequestUser(BaseModel):
+    login: str
+
+
+class GithubPullRequest(BaseModel):
+    title: str
+    html_url: str
+    user: GithubPullRequestUser
+    created_at: datetime.datetime
+
+
+class GithubPullRequestBranch(BaseModel):
+    ref: str
+
+
+class GithubEvent(BaseModel):
+    action: Optional[str]
+    pull_request: Optional[GithubPullRequest]
+    body: Optional[str]
+    base: Optional[GithubPullRequestBranch]
+    head: Optional[GithubPullRequestBranch]
+    commits: Optional[list[GithubCommit]] = []
