@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>'NO...'tion : NAIT</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+        WebFontConfig = {
+            google: {families: ['Inter:400,700', 'Roboto Mono:700']}
+        };
+
+        (function (d) {
+            var wf = d.createElement('script'), s = d.scripts[0];
+            wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+            wf.async = true;
+            s.parentNode.insertBefore(wf, s);
+        })(document);
+
+        function backOrClose() {
+            var prevPage = window.location.href;
+
+            window.history.go(-1);
+
+            setTimeout(function(){
+                if (window.location.href === prevPage) {
+                    window.close();
+                }
+            }, 500);
+        }
+
+        var seconds = 5;
+
+        function countdown() {
+            seconds = seconds - 1;
+            if (seconds < 0) {
+                window.location.href = "#[redirect_url]";
+            } else {
+                document.getElementById("countdown").innerHTML = seconds.toString();
+                window.setTimeout("countdown()", 1000);
+            }
+        }
+
+        window.onload = countdown;
+    </script>
+    <style>
+        html {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            font-size: 16px;
+        }
+
+        html body code {
+            font-family: Monaco, monospace;
+        }
+
+        html.wf-inter-n4-active.wf-inter-n7-active body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        html.wf-inter-n4-active.wf-inter-n7-active body code {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        h1 span {
+            opacity: 0.25;
+        }
+
+        button {
+            cursor: pointer;
+            margin-top: 1.5rem;
+            outline: none;
+            font-family: inherit;
+            border: 1px solid rgb(61, 142, 196);
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            background: rgb(71, 171, 237);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            transition: background 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background: rgb(61, 142, 196);
+        }
+
+        div {
+            max-width: 640px;
+            width: 100%;
+            padding: 0 0.5rem;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h1>There's NO<span>tion</span> #[type] for <code>#[ticket_id]</code></h1>
+    <p>
+        Take your time and Find the #[type] which you were trying to.<br/>
+        We will redirect to Notion in <b><span id="countdown">10</span>...</b>
+    </p>
+    <button onclick="backOrClose()">Wait! Give me one more time</button>
+</div>
+
+</body>
+</html>
