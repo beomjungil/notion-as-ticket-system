@@ -53,7 +53,6 @@ def add_commit_comment(project: Project, commits: list[GithubCommit]):
 
 def add_pr_comment(project: Project, event: GithubEvent):
     if event.action == "opened":
-        print("Open")
         result = ticket_regex.search(event.pull_request.title)
         if result is not None:
             ticket_id = result.groups()[1]
@@ -63,7 +62,7 @@ def add_pr_comment(project: Project, event: GithubEvent):
                 notion_client.comment(
                     notion_client,
                     page_id=ticket.id,
-                    tag_body="PR Opened",
+                    tag_body="PR Open",
                     tag_link=event.pull_request.html_url,
                     body=pr_title,
                     author=event.pull_request.user.login,
