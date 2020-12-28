@@ -1,6 +1,7 @@
 from uuid import uuid1
 
 from notion.client import NotionClient
+from notion.collection import CollectionRowBlock
 
 
 def init(token: str) -> NotionClient:
@@ -9,83 +10,214 @@ def init(token: str) -> NotionClient:
     return client
 
 
-def __comment__(self, tag_message: str, tag_link: str, message: str, timestamp: int) -> dict:
-    new_request_id = str(uuid1())
-    new_comment_id = str(uuid1())
-    new_transaction_id = str(uuid1())
-    # TODO: Hardcoded parent_id. should find correct parrent_id(Discussion Collect's id)
-    # TODO: Should create Discussion Collection when no discussion
-    parent_id = "366242d2-6d43-4643-b3de-a1d4c6bf0a3c"
-    transaction = {
-        "requestId": new_request_id,
+def get_discussion_id(self: NotionClient, page_id: str) -> str:
+    record_map = self.post(
+        "loadPageChunk",
+        {
+            "chunkNumber": 0,
+            "pageId": page_id,
+            "limit": 50,
+            "verticalColumns": False,
+        },
+    ).json()["recordMap"]
+
+    if "discussion" in record_map:
+        return list(record_map["discussion"].keys())[0]
+    else:
+        return ""
+
+
+def __comment__(
+    self,
+    page_id: str,
+    **kwargs,
+):
+    discussion_id = get_discussion_id(self, page_id=page_id)
+    transaction = (
+        not discussion_id
+        and build_start_discussion_transaction(page_id=page_id, **kwargs)
+        or build_add_comment_transaction(
+            discussion_id=discussion_id,
+            **kwargs,
+        )
+    )
+    self.post("saveTransactions", transaction)
+
+
+def build_add_comment_transaction(
+    discussion_id: str,
+    tag_body: str,
+    tag_link: str,
+    body: str,
+    author: str,
+    timestamp: int,
+) -> dict:
+    request_id = str(uuid1())
+    comment_id = str(uuid1())
+    transaction_id = str(uuid1())
+    return {
+        "requestId": request_id,
         "transactions": [
             {
-                "id": new_transaction_id,
+                "id": transaction_id,
                 "spaceId": "15c95d23-c4d5-436e-aa3a-1acbc7f7876c",
                 "operations": [
                     {
-                        "id": new_comment_id,
+                        "id": comment_id,
                         "table": "comment",
                         "path": [],
                         "command": "set",
                         "args": {
-                            "parent_id": parent_id,
+                            "parent_id": discussion_id,
                             "parent_table": "discussion",
                             "text": [
+                                [tag_body, [["c"], ["a", tag_link]]],
                                 [
-                                    tag_message,
+                                    f" {body}",
                                     [
-                                        [
-                                            "c"
-                                        ],
-                                        [
-                                            "a",
-                                            tag_link
-                                        ]
-                                    ]
+                                        ["b"],
+                                    ],
                                 ],
                                 [
-                                    f' {message}'
-                                ]
+                                    f" - {author}",
+                                ],
                             ],
                             "created_by_table": "notion_user",
                             "created_by_id": "00000000-0000-0000-0000-000000000000",
                             "alive": True,
-                            "id": new_comment_id,
-                            "version": 1
-                        }
+                            "id": comment_id,
+                            "version": 1,
+                        },
                     },
                     {
-                        "id": parent_id,
+                        "id": discussion_id,
                         "table": "discussion",
-                        "path": [
-                            "comments"
-                        ],
+                        "path": ["comments"],
                         "command": "listAfter",
-                        "args": {
-                            "id": new_comment_id
-                        }
+                        "args": {"id": comment_id},
                     },
                     {
                         "table": "comment",
-                        "id": new_comment_id,
-                        "path": [
-                            "created_time"
-                        ],
+                        "id": comment_id,
+                        "path": ["created_time"],
                         "command": "set",
-                        "args": timestamp
+                        "args": timestamp,
                     },
                     {
                         "table": "comment",
-                        "id": new_comment_id,
-                        "path": [
-                            "last_edited_time"
-                        ],
+                        "id": comment_id,
+                        "path": ["last_edited_time"],
                         "command": "set",
-                        "args": timestamp
-                    }
-                ]
+                        "args": timestamp,
+                    },
+                ],
             }
-        ]
+        ],
     }
-    self.post('saveTransactions', transaction)
+
+
+def build_start_discussion_transaction(
+    page_id: str,
+    tag_body: str,
+    tag_link: str,
+    body: str,
+    author: str,
+    timestamp: int,
+) -> dict:
+    request_id = str(uuid1())
+    comment_id = str(uuid1())
+    transaction_id = str(uuid1())
+    discussion_id = str(uuid1())
+    notion_user_id = "00000000-0000-0000-0000-000000000000"
+    return {
+        "requestId": request_id,
+        "transactions": [
+            {
+                "id": transaction_id,
+                "spaceId": "15c95d23-c4d5-436e-aa3a-1acbc7f7876c",
+                "operations": [
+                    {
+                        "id": comment_id,
+                        "table": "comment",
+                        "path": [],
+                        "command": "set",
+                        "args": {
+                            "parent_id": discussion_id,
+                            "parent_table": "discussion",
+                            "text": [
+                                [tag_body, [["c"], ["a", tag_link]]],
+                                [
+                                    f" {body}",
+                                    [
+                                        ["b"],
+                                    ],
+                                ],
+                                [
+                                    f" - {author}",
+                                ],
+                            ],
+                            "alive": True,
+                            "id": comment_id,
+                            "version": 1,
+                        },
+                    },
+                    {
+                        "id": discussion_id,
+                        "table": "discussion",
+                        "path": [],
+                        "command": "set",
+                        "args": {
+                            "id": discussion_id,
+                            "parent_id": page_id,
+                            "parent_table": "block",
+                            "resolved": False,
+                            "comments": [comment_id],
+                            "version": 1,
+                        },
+                    },
+                    {
+                        "table": "block",
+                        "id": page_id,
+                        "path": ["discussions"],
+                        "command": "listAfter",
+                        "args": {"id": discussion_id},
+                    },
+                    {
+                        "table": "comment",
+                        "id": comment_id,
+                        "path": ["created_by_id"],
+                        "command": "set",
+                        "args": notion_user_id,
+                    },
+                    {
+                        "table": "comment",
+                        "id": comment_id,
+                        "path": ["created_by_table"],
+                        "command": "set",
+                        "args": "notion_user",
+                    },
+                    {
+                        "table": "comment",
+                        "id": comment_id,
+                        "path": ["created_time"],
+                        "command": "set",
+                        "args": timestamp,
+                    },
+                    {
+                        "table": "comment",
+                        "id": comment_id,
+                        "path": ["last_edited_time"],
+                        "command": "set",
+                        "args": timestamp,
+                    },
+                    {
+                        "table": "block",
+                        "id": page_id,
+                        "path": ["last_edited_time"],
+                        "command": "set",
+                        "args": timestamp,
+                    },
+                ],
+            }
+        ],
+    }
