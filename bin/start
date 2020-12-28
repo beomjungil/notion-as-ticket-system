@@ -1,0 +1,2 @@
+#!/bin/zsh
+uvicorn app.main:app --reload

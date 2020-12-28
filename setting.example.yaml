@@ -1,0 +1,19 @@
+# v2 Token from Notion.
+# How can I get it? -> https://www.redgregory.com/notion/2020/6/15/9zuzav95gwzwewdu1dspweqbv481s5
+notion_token: ''
+
+projects:
+  - name: 'Your Project Name'
+    github_repo: 'owner/repo'
+    # Must be direct URL to Collection(ex: Table, Board, Gallery ...).
+    # It looks like below value
+    notion_board_url: 'https://www.notion.so/blahblahblahblah?v=blahblahblahblah'
+    # 👆's property which contains Ticket ID. It must be unique
+    # To get more information, check Notion Template which linked in README.md
+    notion_ticket_id_property: 'Ticket ID'
+    # Must Capital Alphabets. If your project_prefix is 'SMP'.
+    # Your Ticket will look like:
+    # SMP-123
+    # SMP-124
+    # ...
+    project_prefix: 'SMP'
