@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends, Header
 import re
@@ -30,7 +30,7 @@ def github_webhook(
     return {"result": "ok"}
 
 
-def add_commit_comment(project: Project, commits: list[GithubCommit]):
+def add_commit_comment(project: Project, commits: List[GithubCommit]):
     for commit in commits:
         result = ticket_regex.search(commit.message)
         if result is not None:

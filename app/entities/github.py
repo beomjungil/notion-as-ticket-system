@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -37,4 +37,4 @@ class GithubEvent(BaseModel):
     body: Optional[str]
     base: Optional[GithubPullRequestBranch]
     head: Optional[GithubPullRequestBranch]
-    commits: Optional[list[GithubCommit]] = []
+    commits: Optional[List[GithubCommit]] = []
