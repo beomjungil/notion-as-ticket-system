@@ -25,6 +25,8 @@ class GithubPullRequest(BaseModel):
     html_url: str
     user: GithubPullRequestUser
     created_at: datetime.datetime
+    merged_at: datetime.datetime
+    body: str
 
 
 class GithubPullRequestBranch(BaseModel):
@@ -34,7 +36,6 @@ class GithubPullRequestBranch(BaseModel):
 class GithubEvent(BaseModel):
     action: Optional[str]
     pull_request: Optional[GithubPullRequest]
-    body: Optional[str]
     base: Optional[GithubPullRequestBranch]
     head: Optional[GithubPullRequestBranch]
     commits: Optional[List[GithubCommit]] = []

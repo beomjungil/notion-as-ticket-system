@@ -18,7 +18,7 @@ def redirect_to_board(project: Project = Depends(get_project_by_prefix)):
 
 @router.get("/{prefix_id}/{ticket_id}")
 def redirect_to_ticket(
-        ticket_id: str, project: Project = Depends(get_project_by_prefix)
+    ticket_id: str, project: Project = Depends(get_project_by_prefix)
 ):
     ticket = project.query_ticket(ticket_id=ticket_id)
     notion_url = setting.notion_base_url + ticket.id.replace("-", "")

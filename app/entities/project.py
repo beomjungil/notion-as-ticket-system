@@ -5,15 +5,17 @@ from app.core.expections import NotionException
 
 class Project:
     def __init__(
-            self,
-            name,
-            github_repo,
-            notion_board_url,
-            notion_ticket_id_property,
-            project_prefix,
-            collection_view,
-            *args,
-            **kwargs,
+        self,
+        name,
+        github_repo,
+        notion_board_url,
+        notion_ticket_id_property,
+        project_prefix,
+        collection_view,
+        notion_status_property,
+        notion_closed_status,
+        *args,
+        **kwargs,
     ):
         self.name: str = name
         self.github_repo: str = github_repo
@@ -21,6 +23,8 @@ class Project:
         self.notion_ticket_id_property: str = notion_ticket_id_property
         self.project_prefix: str = project_prefix
         self.collection_view: CollectionView = collection_view
+        self.notion_status_property: str = notion_status_property
+        self.notion_closed_status: str = notion_closed_status
 
     def query_ticket(self, ticket_id: str) -> CollectionRowBlock:
         filter_params = {
@@ -43,8 +47,16 @@ class Project:
         if len(query_result) == 1:
             return query_result[0]
         elif len(query_result) > 1:
-            raise NotionException(is_ticket=True, code=f'{self.project_prefix}-{ticket_id}',
-                                  redirect_to=self.notion_board_url, message='More than one ticket')
+            raise NotionException(
+                is_ticket=True,
+                code=f"{self.project_prefix}-{ticket_id}",
+                redirect_to=self.notion_board_url,
+                message="More than one ticket",
+            )
         else:
-            raise NotionException(is_ticket=True, code=f'{self.project_prefix}-{ticket_id}',
-                                  redirect_to=self.notion_board_url, message='No such ticket')
+            raise NotionException(
+                is_ticket=True,
+                code=f"{self.project_prefix}-{ticket_id}",
+                redirect_to=self.notion_board_url,
+                message="No such ticket",
+            )

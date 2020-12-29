@@ -1,7 +1,6 @@
 from uuid import uuid1
 
 from notion.client import NotionClient
-from notion.collection import CollectionRowBlock
 
 
 def init(token: str) -> NotionClient:
