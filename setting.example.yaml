@@ -8,9 +8,13 @@ projects:
     # Must be direct URL to Collection(ex: Table, Board, Gallery ...).
     # It looks like below value
     notion_board_url: 'https://www.notion.so/blahblahblahblah?v=blahblahblahblah'
-    # 👆's property which contains Ticket ID. It must be unique
+    # <notion_board>'s property which contains Ticket ID. It must be unique
     # To get more information, check Notion Template which linked in README.md
     notion_ticket_id_property: 'Ticket ID'
+    # <notion_board>'s property which contains Ticket's Status
+    notion_status_property: 'Status'
+    # Value for 👆 which represent Ticket Closed
+    notion_closed_status: ''
     # Must Capital Alphabets. If your project_prefix is 'SMP'.
     # Your Ticket will look like:
     # SMP-123
